@@ -1,21 +1,58 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* src/app/globals.css */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* 1. Resets & Base */
+html,
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif, Arial, sans-serif;
+  height: 100%;
+  background-color: #141629; /* dark background */
+}
+
+/* 2. Dark Theme Overrides (optional) */
+:root {
+  --text-color: #fff;
+  --text-secondary: #a6a8b6;
+  --panel-color: #1b1e35;
+  --border-color: #2c2f48;
+  --accent-color: #56fca2;
+}
+
+/* Ant Design overrides can go here if needed */
+.ant-layout {
+  background: #141629;
+}
+
+.ant-layout-header {
+  background: #1b1e35; /* or #000 if you prefer */
+}
+
+.ant-layout-sider {
+  background: #1b1e35;
+}
+
+/* Example: Adjust Menu item colors in dark mode */
+.ant-menu-dark.ant-menu-dark:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: #2c2f48;
+}
+
+.ant-menu-dark .ant-menu-item-selected > a,
+.ant-menu-dark .ant-menu-item-selected > a:hover {
+  color: #fff;
+}
+
+.ant-card {
+  background-color: #1b1e35;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.ant-card-head {
+  background: #1b1e35;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ant-card-body {
+  color: var(--text-color);
 }
