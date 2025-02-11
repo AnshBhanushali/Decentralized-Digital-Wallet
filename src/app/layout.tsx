@@ -1,5 +1,4 @@
-// src/app/layout.tsx
-"use client"; // Required if using client-side components in Next.js 13
+"use client";
 
 import React from 'react';
 import { Layout, Menu } from 'antd';
@@ -21,14 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* We can wrap the entire app in Ant Design's Layout */}
         <Layout style={{ minHeight: '100vh' }}>
           {/* ---------- Sidebar ---------- */}
-          <Sider
-            collapsible
-            style={{ background: '#1b1e35' }}
-            defaultCollapsed={false}
-          >
+          <Sider collapsible style={{ background: '#1b1e35' }} defaultCollapsed={false}>
             <div
               style={{
                 color: '#fff',
@@ -38,7 +32,7 @@ export default function RootLayout({
                 padding: '16px 0',
               }}
             >
-              CryptoApp
+              ZenVault
             </div>
             <Menu
               theme="dark"
@@ -70,7 +64,7 @@ export default function RootLayout({
             />
           </Sider>
 
-          {/* ---------- Main Content Area ---------- */}
+          {/* ---------- Main Content ---------- */}
           <Layout>
             <Header
               style={{
@@ -81,12 +75,9 @@ export default function RootLayout({
                 justifyContent: 'flex-end',
               }}
             >
-              {/* Placeholder for user profile or other icons */}
               <div style={{ color: '#fff' }}>Hello, Jane Doe</div>
             </Header>
-            <Content style={{ margin: '16px', minHeight: '280px' }}>
-              {children}
-            </Content>
+            <Content style={{ margin: '16px' }}>{children}</Content>
           </Layout>
         </Layout>
       </body>
