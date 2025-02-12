@@ -11,7 +11,6 @@ interface Transaction {
   amount: number;
 }
 
-// Table columns definition
 const columns = [
   {
     title: "Transaction",
@@ -31,26 +30,10 @@ const columns = [
   },
 ];
 
-// Dummy transaction data (replace with backend data if needed)
 const data: Transaction[] = [
-  {
-    key: "1",
-    name: "Buy BTC",
-    date: "Aug 28, 08:00",
-    amount: 1200,
-  },
-  {
-    key: "2",
-    name: "Buy ETH",
-    date: "Aug 27, 10:15",
-    amount: 800,
-  },
-  {
-    key: "3",
-    name: "Sell ADA",
-    date: "Aug 26, 16:30",
-    amount: 350,
-  },
+  { key: "1", name: "Buy BTC", date: "Aug 28, 08:00", amount: 1200 },
+  { key: "2", name: "Buy ETH", date: "Aug 27, 10:15", amount: 800 },
+  { key: "3", name: "Sell ADA", date: "Aug 26, 16:30", amount: 350 },
 ];
 
 const cryptoSymbols = [
@@ -65,7 +48,6 @@ const chartTypeOptions = [
   { label: "24h Change", value: "change" },
 ];
 
-// Map from symbol to CoinGecko coin id
 const symbolToCoinId: Record<string, string> = {
   BTCUSDT: "bitcoin",
   ETHUSDT: "ethereum",
@@ -73,21 +55,23 @@ const symbolToCoinId: Record<string, string> = {
   ADAUSDT: "cardano",
 };
 
-export default function Page() {
+export const pageTitle = "Portfolio";
+
+export default function Portfolio() {
   // State for selected crypto symbol (for the chart)
   const [symbol, setSymbol] = useState("BTCUSDT");
   // State for chart type (if needed by the chart widget)
   const [chartType, setChartType] = useState("price");
 
-  // ---- State for data from Python backend (for top gainer/loser) ----
+  // State for market overview data from your backend
   const [marketOverview, setMarketOverview] = useState<any>(null);
   const [backendLoading, setBackendLoading] = useState(true);
 
-  // ---- New state for dynamic coin data ----
+  // State for dynamic coin data from CoinGecko
   const [coinData, setCoinData] = useState<{ price: number; change_24h: number } | null>(null);
   const [coinLoading, setCoinLoading] = useState(true);
 
-  // Fetch market overview from backend once on mount
+  // Fetch market overview from backend once on mount.
   useEffect(() => {
     async function loadMarketOverview() {
       try {
@@ -103,7 +87,7 @@ export default function Page() {
     loadMarketOverview();
   }, []);
 
-  // Fetch dynamic data for the selected coin from CoinGecko whenever symbol changes
+  // Fetch dynamic coin data from CoinGecko whenever symbol changes.
   useEffect(() => {
     async function loadCoinData() {
       setCoinLoading(true);
@@ -113,12 +97,12 @@ export default function Page() {
         setCoinLoading(false);
         return;
       }
-
-      // FIX #1: Correctly use backticks for string interpolation
       const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true`;
-
       try {
         const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         if (data && data[coinId]) {
           setCoinData({
@@ -138,7 +122,6 @@ export default function Page() {
     loadCoinData();
   }, [symbol]);
 
-  // Show loading if either backend or coin data is still loading
   if (backendLoading || coinLoading) {
     return (
       <div style={{ color: "#fff", textAlign: "center", paddingTop: 50 }}>
@@ -147,7 +130,6 @@ export default function Page() {
     );
   }
 
-  // Fallback for missing data
   if (!coinData || !marketOverview) {
     return (
       <div style={{ color: "#fff", textAlign: "center", paddingTop: 50 }}>
@@ -156,11 +138,8 @@ export default function Page() {
     );
   }
 
-  // Dynamic data for the selected coin
-  const currentPrice = coinData.price; // current price of selected coin
-  const coinChange = coinData.change_24h; // 24h change for selected coin
-
-  // Market overview from backend for top gainer/loser
+  const currentPrice = coinData.price;
+  const coinChange = coinData.change_24h;
   const topGainer = marketOverview.top_gainer
     ? `${marketOverview.top_gainer.id?.toUpperCase()} +${marketOverview.top_gainer.change_24h.toFixed(2)}%`
     : "N/A";
@@ -170,25 +149,16 @@ export default function Page() {
 
   return (
     <div style={{ width: "100%" }}>
-      {/* ---------- Live Chart Card (Dark Card) ---------- */}
+      <h1 style={{ color: "#fff" }}>{pageTitle}</h1>
       <Card className="black-card" style={{ marginBottom: 24 }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            flexWrap: "wrap",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           <h2 style={{ color: "#fff", margin: 0 }}>Live Crypto Chart</h2>
-          {/* Symbol selection */}
           <Select
             style={{ width: 200 }}
             value={symbol}
             onChange={(val) => setSymbol(val)}
             options={cryptoSymbols}
           />
-          {/* Chart type toggle */}
           <Select
             style={{ width: 200 }}
             value={chartType}
@@ -196,13 +166,9 @@ export default function Page() {
             options={chartTypeOptions}
           />
         </div>
-        {/* TradingViewChart now receives both symbol and chartType */}
         <TradingViewChart symbol={symbol} chartType={chartType} />
       </Card>
-
-      {/* ---------- Overview Cards (Dark Cards) ---------- */}
       <Row gutter={[16, 16]}>
-        {/* Current Price */}
         <Col xs={24} sm={12} md={6}>
           <Card className="black-card">
             <h4 style={{ color: "#a6a8b6" }}>Current Price</h4>
@@ -211,15 +177,12 @@ export default function Page() {
             </h2>
           </Card>
         </Col>
-
-        {/* 24h Change */}
         <Col xs={24} sm={12} md={6}>
           <Card className="black-card">
             <h4 style={{ color: "#a6a8b6" }}>24h Change</h4>
             <h2
               style={{
                 marginTop: 8,
-                // FIX #2: Properly interpolate +/– sign
                 color: coinChange >= 0 ? "#56fca2" : "#ff6370",
               }}
             >
@@ -229,16 +192,12 @@ export default function Page() {
             </h2>
           </Card>
         </Col>
-
-        {/* Top Gainer (from backend) */}
         <Col xs={24} sm={12} md={6}>
           <Card className="black-card">
             <h4 style={{ color: "#a6a8b6" }}>Top Gainer</h4>
             <h2 style={{ marginTop: 8 }}>{topGainer}</h2>
           </Card>
         </Col>
-
-        {/* Top Loser (from backend) */}
         <Col xs={24} sm={12} md={6}>
           <Card className="black-card">
             <h4 style={{ color: "#a6a8b6" }}>Top Loser</h4>
@@ -246,18 +205,10 @@ export default function Page() {
           </Card>
         </Col>
       </Row>
-
-      {/* ---------- Recent Transactions (Dark-Themed Table) ---------- */}
       <Card
         className="black-card"
-        style={{
-          marginTop: 24,
-          backgroundColor: "#1F1F1F",
-          color: "#fff",
-        }}
-        title={
-          <h3 style={{ color: "#fff", margin: 0 }}>Recent Transactions</h3>
-        }
+        style={{ marginTop: 24, backgroundColor: "#1F1F1F", color: "#fff" }}
+        title={<h3 style={{ color: "#fff", margin: 0 }}>Recent Transactions</h3>}
       >
         <Table
           columns={columns}

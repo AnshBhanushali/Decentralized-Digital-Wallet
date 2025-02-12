@@ -1,15 +1,13 @@
-# main.py
-from typing import List, Dict, Any
+from typing import Dict, Any
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 import requests
-import os
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # or "*" for all origins
+    allow_origins=["http://localhost:3000"],  # Adjust this as needed or use "*" to allow all origins.
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,28 +27,22 @@ USER_WALLETS = {
 
 COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3"
 
-
 @app.get("/")
-def root():
+def root() -> Dict[str, Any]:
     return {"message": "Crypto Portfolio API is running!"}
-
 
 @app.get("/portfolio")
 def get_portfolio(user: str = Query(..., description="User ID or username")) -> Dict[str, Any]:
-    """
-    Returns the total portfolio value, plus a breakdown by coin,
-    for the given user.
-    """
     if user not in USER_WALLETS:
         raise HTTPException(status_code=404, detail=f"User {user} not found.")
 
     coins = USER_WALLETS[user]
-    symbols = [k.lower() for k in coins.keys()]  
+    symbols = [k.lower() for k in coins.keys()]
 
     # Build query param for CoinGecko
     coinlist = ",".join(symbols)
     params = {
-        "ids": coinlist, 
+        "ids": coinlist,
         "vs_currencies": "usd",
         "include_24hr_change": "true"
     }
@@ -59,13 +51,12 @@ def get_portfolio(user: str = Query(..., description="User ID or username")) -> 
     if response.status_code != 200:
         raise HTTPException(status_code=502, detail="Failed to fetch prices from CoinGecko.")
 
-    price_data = response.json() 
+    price_data = response.json()
     total_value = 0.0
     breakdown = []
     for coin_symbol, amount in coins.items():
         coin_symbol_lower = coin_symbol.lower()
         if coin_symbol_lower not in price_data:
-            # Skip unknown coin
             continue
         coin_price = price_data[coin_symbol_lower].get("usd", 0)
         coin_change_24h = price_data[coin_symbol_lower].get("usd_24h_change", 0)
@@ -85,17 +76,12 @@ def get_portfolio(user: str = Query(..., description="User ID or username")) -> 
         "coins": breakdown
     }
 
-
 @app.get("/market_overview")
 def get_market_overview() -> Dict[str, Any]:
-    """
-    Returns info about top gainers, top losers, etc. from an external API.
-    For example, we can fetch the top 10 coins from CoinGecko, sorted by 24h change.
-    """
     params = {
         "vs_currency": "usd",
         "order": "market_cap_desc",
-        "per_page": 50,  # we can filter top 50
+        "per_page": 50,
         "page": 1,
         "sparkline": "false",
         "price_change_percentage": "24h"
@@ -104,7 +90,7 @@ def get_market_overview() -> Dict[str, Any]:
     if resp.status_code != 200:
         raise HTTPException(status_code=502, detail="Failed to fetch market data from CoinGecko.")
 
-    data = resp.json()  # list of coins with price change info
+    data = resp.json()
     if not data:
         return {"top_gainer": None, "top_loser": None}
 
@@ -125,4 +111,3 @@ def get_market_overview() -> Dict[str, Any]:
             "change_24h": top_loser.get("price_change_percentage_24h"),
         }
     }
-   
