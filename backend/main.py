@@ -97,6 +97,8 @@ def get_market_overview() -> Dict[str, Any]:
     top_gainer = max(data, key=lambda c: c.get("price_change_percentage_24h", 0))
     top_loser = min(data, key=lambda c: c.get("price_change_percentage_24h", 0))
 
+    
+
     return {
         "top_gainer": {
             "id": top_gainer.get("id"),

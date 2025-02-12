@@ -39,7 +39,6 @@ const menuItems = [
 
 export default function Sidebar() {
   // Local state to track when the component has mounted.
-  // This prevents hydration mismatches due to client-only values.
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
@@ -47,15 +46,12 @@ export default function Sidebar() {
     setMounted(true);
   }, []);
 
-  // Until the component has mounted on the client,
-  // return null (or a placeholder) to avoid mismatches.
+  // Until the component has mounted on the client, return null.
   if (!mounted) {
     return null;
   }
 
-  // Normalize the selected key:
-  // For example, if the current route is "/" (or empty),
-  // we want to highlight the Portfolio menu item.
+  // Normalize the selected key: if the current route is "/" or "", highlight "/portfolio".
   let normalizedPath = pathname;
   if (pathname === "/" || pathname === "") {
     normalizedPath = "/portfolio";
@@ -79,8 +75,8 @@ export default function Sidebar() {
         theme="dark"
         mode="inline"
         style={{ background: "#1b1e35" }}
-        selectedKeys={selectedKeys} // This will match the current route
-        items={menuItems}
+        selectedKeys={selectedKeys}
+        items={menuItems}  // Pass your menuItems array here!
       />
     </Sider>
   );

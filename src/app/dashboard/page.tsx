@@ -1,3 +1,11 @@
+"use client";
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
+export {};
 import React, { useEffect, useState } from 'react';
 import type { NextPage } from 'next';
 import {
@@ -12,7 +20,7 @@ import {
   Form,
   Input,
   Select,
-  message
+  message,
 } from 'antd';
 import { WalletOutlined, AreaChartOutlined, SwapOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -66,11 +74,9 @@ const Dashboard: NextPage = () => {
   // ---------------------------
   const [collapsed, setCollapsed] = useState(false);
   const [connectedAccount, setConnectedAccount] = useState<string | null>(null);
-
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balanceData, setBalanceData] = useState<BalanceData | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-
   // Form
   const [form] = Form.useForm();
 
@@ -81,7 +87,13 @@ const Dashboard: NextPage = () => {
     try {
       const res = await fetch('http://127.0.0.1:8000/transactions');
       const data = await res.json();
-      setTransactions(data);
+      console.log('Fetched transactions:', data);
+      // Ensure that the data is an array.
+      // Adjust the logic below if your API response shape is different.
+      const transactionsArray = Array.isArray(data)
+        ? data
+        : data.transactions || [];
+      setTransactions(transactionsArray);
     } catch (err) {
       console.error(err);
       message.error('Failed to load transactions.');
@@ -215,6 +227,27 @@ const Dashboard: NextPage = () => {
   };
 
   // ---------------------------
+  // Menu items for the sidebar using the items prop
+  // ---------------------------
+  const menuItems = [
+    {
+      key: "1",
+      icon: <AreaChartOutlined />,
+      label: "Dashboard",
+    },
+    {
+      key: "2",
+      icon: <SwapOutlined />,
+      label: "Quick Exchange",
+    },
+    {
+      key: "3",
+      icon: <WalletOutlined />,
+      label: "Connect Wallet",
+    },
+  ];
+
+  // ---------------------------
   // Render
   // ---------------------------
   return (
@@ -235,17 +268,7 @@ const Dashboard: NextPage = () => {
         >
           MyCrypto
         </div>
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item key="1" icon={<AreaChartOutlined />}>
-            Dashboard
-          </Menu.Item>
-          <Menu.Item key="2" icon={<SwapOutlined />}>
-            Quick Exchange
-          </Menu.Item>
-          <Menu.Item key="3" icon={<WalletOutlined />}>
-            Connect Wallet
-          </Menu.Item>
-        </Menu>
+        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={menuItems} />
       </Sider>
 
       <Layout>
