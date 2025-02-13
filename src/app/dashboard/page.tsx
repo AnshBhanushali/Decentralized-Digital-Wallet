@@ -229,47 +229,13 @@ const Dashboard: NextPage = () => {
   // ---------------------------
   // Menu items for the sidebar using the items prop
   // ---------------------------
-  const menuItems = [
-    {
-      key: "1",
-      icon: <AreaChartOutlined />,
-      label: "Dashboard",
-    },
-    {
-      key: "2",
-      icon: <SwapOutlined />,
-      label: "Quick Exchange",
-    },
-    {
-      key: "3",
-      icon: <WalletOutlined />,
-      label: "Connect Wallet",
-    },
-  ];
+
 
   // ---------------------------
   // Render
   // ---------------------------
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={onCollapse} width={220}>
-        <div
-          style={{
-            height: 64,
-            margin: 16,
-            background: 'rgba(255,255,255,0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-            fontWeight: 'bold',
-            fontSize: collapsed ? 16 : 20,
-          }}
-        >
-          MyCrypto
-        </div>
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={menuItems} />
-      </Sider>
 
       <Layout>
         <Header style={{ background: '#fff', paddingLeft: 16, display: 'flex', alignItems: 'center' }}>
