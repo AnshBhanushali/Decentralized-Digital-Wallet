@@ -238,11 +238,11 @@ const Dashboard: NextPage = () => {
     <Layout style={{ minHeight: '100vh' }}>
 
       <Layout>
-        <Header style={{ background: '#fff', paddingLeft: 16, display: 'flex', alignItems: 'center' }}>
-          <h2 style={{ margin: 0 }}>Crypto Dashboard</h2>
+        <Header style={{ background: '#0000', paddingLeft: 16, display: 'flex', alignItems: 'center' }}>
+          <h2 style={{ margin: 0, color: '#FFF' }}>Crypto Dashboard</h2>
         </Header>
 
-        <Content style={{ margin: '16px' }}>
+        <Content style={{ margin: '16px',color: '#FFF' }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} lg={6}>
               <Card>
