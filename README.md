@@ -22,7 +22,7 @@ A crypto wallet dashboard built with Next.js and FastAPI that connects to a loca
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/anshbhanushali/crypto-wallet-dashboard.git
+   git clone https://github.com/anshbhanushali/crypto-wallet-dashboard.git or https://github.com/AnshBhanushali/Decentralized-Digital-Wallet.git
    cd crypto
    ```
 2. **Install dependencies:**
