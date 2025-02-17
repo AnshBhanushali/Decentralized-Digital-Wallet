@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Layout } from "antd";
-import Sidebar from "@/components/Sidebar"; // Import Sidebar component
+import Sidebar from "@/components/Sidebar";
 import "./globals.css";
 
 const { Content, Header } = Layout;
@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Layout style={{ minHeight: "100vh" }}>
-          <Sidebar /> {/* Sidebar is now a separate reusable component */}
+          <Sidebar />
 
           <Layout>
             <Header
@@ -28,7 +28,7 @@ export default function RootLayout({
                 justifyContent: "flex-end",
               }}
             >
-              <div style={{ color: "#fff" }}>Hello, Jane Doe</div>
+              <div style={{ color: "#fff" }}>Hello</div>
             </Header>
             <Content style={{ margin: "16px" }}>{children}</Content>
           </Layout>

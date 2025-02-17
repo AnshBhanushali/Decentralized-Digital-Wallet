@@ -49,7 +49,7 @@ interface BalanceData {
 }
 
 interface ChartDataPoint {
-  timestamp: string; // e.g. "2022-03-01"
+  timestamp: string; 
   price: number;
 }
 
@@ -236,19 +236,7 @@ const Dashboard: NextPage = () => {
   // ---------------------------
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={onCollapse} style={{ background: "#1b1e1e" }}>
-        <div
-          style={{
-            color: "#fff",
-            fontSize: 20,
-            fontWeight: 600,
-            textAlign: "center",
-            padding: "16px 0",
-          }}
-        >
-          ZenVault
-        </div>
-      </Sider>
+      
 
       <Layout>
         <Header style={{ background: "#000", paddingLeft: 16, display: "flex", alignItems: "center" }}>

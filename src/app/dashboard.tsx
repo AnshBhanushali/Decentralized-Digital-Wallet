@@ -65,7 +65,6 @@ export default function dashboard() {
             />
           ) : (
             <>
-              {/* Your dashboard content goes here */}
             </>
           )}
         </Content>
