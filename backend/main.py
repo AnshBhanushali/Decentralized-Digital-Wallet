@@ -73,7 +73,8 @@ class WalletVerificationResponse(BaseModel):
 # MOCK DATA
 # -----------------------
 
-# User wallets for portfolio endpoint
+# User wallets for portfolio endpoint.
+# For demo purposes, users who have not added a wallet can use the special wallet "demo"
 USER_WALLETS = {
     "user1": {
         "BTC": 0.5,
@@ -83,6 +84,11 @@ USER_WALLETS = {
     "user2": {
         "BTC": 0.1,
         "ADA": 1000.0
+    },
+    # "demo" wallet for users not connecting a wallet
+    "demo": {
+        "BTC": 0.0,
+        "USDT": 0.0
     }
 }
 
@@ -91,7 +97,8 @@ TICKER_TO_ID = {
     "BTC": "bitcoin",
     "ETH": "ethereum",
     "DOGE": "dogecoin",
-    "ADA": "cardano"
+    "ADA": "cardano",
+    "USDT": "tether"
 }
 
 COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3"
@@ -125,10 +132,12 @@ fake_transactions_db = {
             status="Pending",
             fees=0.001
         )
-    ]
+    ],
+    # For demo wallet quick exchanges, store transactions under the key "demo"
+    "demo": []
 }
 
-# Dummy balance data
+# Dummy balance data (for demonstration, only used if wallet exists)
 fake_balance_db = Balance(
     total_balance_btc=355.056,
     total_balance_usd=4533899.30
@@ -158,7 +167,7 @@ def get_portfolio(user: str = Query(..., description="User ID or username")) -> 
     if user not in USER_WALLETS:
         raise HTTPException(status_code=404, detail=f"User {user} not found.")
     coins = USER_WALLETS[user]
-    # Map ticker symbols to CoinGecko IDs and ensure they're lowercase
+    # Convert ticker symbols to CoinGecko IDs
     coin_ids = [TICKER_TO_ID.get(coin, coin).lower() for coin in coins.keys()]
     coinlist = ",".join(coin_ids)
     params = {
@@ -254,6 +263,28 @@ def quick_exchange(request: QuickExchangeRequest) -> QuickExchangeResponse:
         raise HTTPException(status_code=400, detail="Unsupported coin for exchange.")
     rate = rates[request.haveCoin] / rates[request.wantCoin]
     exchanged = request.haveAmount * rate
+
+    # If the wallet_address is "demo", simulate a quick exchange without affecting any real wallet.
+    if request.wallet_address.lower() == "demo":
+        # Create a pseudo transaction record and add it to the demo transactions.
+        import datetime
+        tx = Transaction(
+            coin=request.wantCoin,
+            transaction_amount=exchanged,
+            transaction_id=f"demo-{datetime.datetime.utcnow().timestamp()}",
+            date=datetime.datetime.utcnow().isoformat(),
+            status="Simulated",
+            fees=0.0
+        )
+        if "demo" not in fake_transactions_db:
+            fake_transactions_db["demo"] = []
+        fake_transactions_db["demo"].append(tx)
+        return QuickExchangeResponse(
+            message=f"(Demo) Successfully exchanged {request.haveAmount} {request.haveCoin} to {exchanged:.2f} {request.wantCoin} (mocked).",
+            exchangedAmount=exchanged
+        )
+
+    # In a real scenario, here you would update the user's wallet accordingly.
     return QuickExchangeResponse(
         message=f"Successfully exchanged {request.haveAmount} {request.haveCoin} to {exchanged:.2f} {request.wantCoin} (mocked).",
         exchangedAmount=exchanged

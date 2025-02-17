@@ -6,7 +6,6 @@ declare global {
 }
 export {};
 
-
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import type { NextPage } from "next";
@@ -54,6 +53,12 @@ interface ChartDataPoint {
   price: number;
 }
 
+interface QuickExchangeFields {
+  haveCoin: string;
+  haveAmount: number;
+  wantCoin: string;
+}
+
 // ---------------------------
 // Mapping for chart symbols
 // ---------------------------
@@ -64,9 +69,8 @@ const cryptoChartMapping: Record<string, string> = {
   ADA: "ADAUSDT",
 };
 
-// ---------------------------
-// Dashboard Component
-// ---------------------------
+export const pageTitle = "Portfolio";
+
 const Dashboard: NextPage = () => {
   // ---------------------------
   // State
@@ -78,18 +82,22 @@ const Dashboard: NextPage = () => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   // New state for selected crypto for market chart and quick exchange.
   const [selectedChartCrypto, setSelectedChartCrypto] = useState<string>("BTC");
-  // Form instance
+  // Form instance for quick exchange
   const [form] = Form.useForm();
 
   // ---------------------------
   // Fetch data from FastAPI
   // ---------------------------
   async function fetchTransactions() {
+    // Use connectedAccount if available; otherwise, use "demo"
+    const walletAddress = connectedAccount || "demo";
     try {
-      const res = await fetch("http://127.0.0.1:8000/transactions");
+      const res = await fetch(`http://127.0.0.1:8000/transactions?wallet_address=${walletAddress}`);
       const data = await res.json();
       console.log("Fetched transactions:", data);
-      const transactionsArray = Array.isArray(data) ? data : data.transactions || [];
+      const transactionsArray = Array.isArray(data)
+        ? data
+        : data.transactions || [];
       setTransactions(transactionsArray);
     } catch (err) {
       console.error(err);
@@ -120,10 +128,11 @@ const Dashboard: NextPage = () => {
   }
 
   useEffect(() => {
+    // Fetch initial data using the current wallet (or demo)
     fetchTransactions();
     fetchBalance();
     fetchChartData();
-  }, []);
+  }, [connectedAccount]);
 
   // ---------------------------
   // Connect to MetaMask
@@ -192,24 +201,23 @@ const Dashboard: NextPage = () => {
   // ---------------------------
   // Quick Exchange
   // ---------------------------
-  interface QuickExchangeFields {
-    haveCoin: string;
-    haveAmount: number;
-    wantCoin: string;
-  }
-
   const handleQuickExchange = async (values: QuickExchangeFields) => {
     try {
+      // Use connectedAccount if available; otherwise, use "demo"
+      const walletAddress = connectedAccount || "demo";
+      const payload = { wallet_address: walletAddress, ...values };
       const response = await fetch("http://127.0.0.1:8000/quick_exchange", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) {
         throw new Error("Exchange request failed");
       }
       const data = await response.json();
       message.success(data.message);
+      // After exchange, refresh transactions to show new simulated activity.
+      fetchTransactions();
     } catch (error) {
       console.error(error);
       message.error("Exchange failed. Check console for details.");
@@ -229,7 +237,6 @@ const Dashboard: NextPage = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider collapsible collapsed={collapsed} onCollapse={onCollapse} style={{ background: "#1b1e1e" }}>
-        {/* You can add your sidebar Menu here if needed */}
         <div
           style={{
             color: "#fff",
@@ -241,7 +248,6 @@ const Dashboard: NextPage = () => {
         >
           ZenVault
         </div>
-        {/* Optionally, add sidebar Menu here */}
       </Sider>
 
       <Layout>
@@ -274,12 +280,11 @@ const Dashboard: NextPage = () => {
           <Row gutter={16} style={{ marginTop: 16 }}>
             <Col xs={24} md={14}>
               <Card title="Market Chart">
-                {/* Add a select to choose the crypto for the market chart */}
                 <Select
                   value={selectedChartCrypto}
                   onChange={(value) => {
                     setSelectedChartCrypto(value);
-                    // Optionally, update the quick exchange form's default if needed:
+                    // Optionally update quick exchange form default:
                     form.setFieldsValue({ haveCoin: value });
                   }}
                   style={{ width: 120, marginBottom: 16 }}
@@ -289,7 +294,6 @@ const Dashboard: NextPage = () => {
                   <Option value="DOGE">DOGE</Option>
                   <Option value="ADA">ADA</Option>
                 </Select>
-                {/* Use TradingViewChart for the market chart */}
                 <TradingViewChart
                   symbol={cryptoChartMapping[selectedChartCrypto]}
                   chartType="price"
