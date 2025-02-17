@@ -1,4 +1,4 @@
-# Crypto Wallet Dashboard
+# Crypto Blockchain Wallet
 
 A crypto wallet dashboard built with Next.js and FastAPI that connects to a local Ethereum node using ethers.js. It displays balances, market charts, transactions, and simulates quick token exchanges with demo mode support.
 
