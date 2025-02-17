@@ -21,9 +21,10 @@ import {
   Form,
   Input,
   Select,
+  Modal,
   message,
 } from "antd";
-import { WalletOutlined, AreaChartOutlined, SwapOutlined } from "@ant-design/icons";
+import { WalletOutlined, AreaChartOutlined, SwapOutlined, SearchOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { ethers } from "ethers";
 import TradingViewChart from "@/components/stockchart";
@@ -84,12 +85,13 @@ const Dashboard: NextPage = () => {
   const [selectedChartCrypto, setSelectedChartCrypto] = useState<string>("BTC");
   // Form instance for quick exchange
   const [form] = Form.useForm();
+  // State for MetaMask not found modal
+  const [modalVisible, setModalVisible] = useState(false);
 
   // ---------------------------
   // Fetch data from FastAPI
   // ---------------------------
   async function fetchTransactions() {
-    // Use connectedAccount if available; otherwise, use "demo"
     const walletAddress = connectedAccount || "demo";
     try {
       const res = await fetch(`http://127.0.0.1:8000/transactions?wallet_address=${walletAddress}`);
@@ -128,7 +130,6 @@ const Dashboard: NextPage = () => {
   }
 
   useEffect(() => {
-    // Fetch initial data using the current wallet (or demo)
     fetchTransactions();
     fetchBalance();
     fetchChartData();
@@ -144,14 +145,26 @@ const Dashboard: NextPage = () => {
         const accounts = await provider.send("eth_requestAccounts", []);
         if (accounts.length > 0) {
           setConnectedAccount(accounts[0]);
+          message.success("Wallet connected successfully.");
         }
       } catch (err) {
         console.error(err);
         message.error("Failed to connect MetaMask.");
       }
     } else {
-      message.warning("MetaMask not found! Please install it.");
+      // Show modal pop-up if MetaMask is not found
+      setModalVisible(true);
     }
+  };
+
+  const handleModalOk = () => {
+    // Redirect to the MetaMask Chrome Web Store
+    window.open("https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn", "_blank");
+    setModalVisible(false);
+  };
+
+  const handleModalCancel = () => {
+    setModalVisible(false);
   };
 
   // ---------------------------
@@ -203,7 +216,6 @@ const Dashboard: NextPage = () => {
   // ---------------------------
   const handleQuickExchange = async (values: QuickExchangeFields) => {
     try {
-      // Use connectedAccount if available; otherwise, use "demo"
       const walletAddress = connectedAccount || "demo";
       const payload = { wallet_address: walletAddress, ...values };
       const response = await fetch("http://127.0.0.1:8000/quick_exchange", {
@@ -216,7 +228,6 @@ const Dashboard: NextPage = () => {
       }
       const data = await response.json();
       message.success(data.message);
-      // After exchange, refresh transactions to show new simulated activity.
       fetchTransactions();
     } catch (error) {
       console.error(error);
@@ -236,7 +247,6 @@ const Dashboard: NextPage = () => {
   // ---------------------------
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      
 
       <Layout>
         <Header style={{ background: "#000", paddingLeft: 16, display: "flex", alignItems: "center" }}>
@@ -264,6 +274,19 @@ const Dashboard: NextPage = () => {
             </Col>
           </Row>
 
+          {/* MetaMask Not Found Modal */}
+          <Modal
+            title="MetaMask Not Found"
+            open={modalVisible}
+            onOk={handleModalOk}
+            onCancel={handleModalCancel}
+            okText="Install MetaMask"
+            cancelText="Cancel"
+            >
+          <p>MetaMask is required to connect your wallet. Please install the MetaMask extension from the Chrome Web Store to proceed.</p>
+          </Modal>
+
+
           {/* Market Chart and Quick Exchange */}
           <Row gutter={16} style={{ marginTop: 16 }}>
             <Col xs={24} md={14}>
@@ -272,7 +295,6 @@ const Dashboard: NextPage = () => {
                   value={selectedChartCrypto}
                   onChange={(value) => {
                     setSelectedChartCrypto(value);
-                    // Optionally update quick exchange form default:
                     form.setFieldsValue({ haveCoin: value });
                   }}
                   style={{ width: 120, marginBottom: 16 }}
@@ -326,7 +348,6 @@ const Dashboard: NextPage = () => {
             </Col>
           </Row>
 
-          {/* Transactions Table */}
           <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
             <Col xs={24}>
               <Card title="Recent Activities">
