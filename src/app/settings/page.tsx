@@ -57,8 +57,8 @@ const Settings: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Header style={{ background: "#000", padding: "0 24px" }}>
-        <h2 style={{ color: "#FFF" }}>Settings</h2>
+      <Header style={{padding: "0 24px" }}>
+        <h2 style={{ color: "#FFF", fontSize: '24px' }}>Settings</h2>
       </Header>
       <Content style={{ padding: "24px" }}>
         <Card title="User & Wallet Settings" style={{ maxWidth: 600, margin: "0 auto" }}>

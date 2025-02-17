@@ -249,7 +249,7 @@ const Dashboard: NextPage = () => {
     <Layout style={{ minHeight: "100vh" }}>
 
       <Layout>
-        <Header style={{ background: "#000", paddingLeft: 16, display: "flex", alignItems: "center" }}>
+        <Header style={{ paddingLeft: 16, display: "flex", alignItems: "center" }}>
           <h2 style={{ margin: 0, color: "#FFF" }}>Crypto Dashboard</h2>
         </Header>
 

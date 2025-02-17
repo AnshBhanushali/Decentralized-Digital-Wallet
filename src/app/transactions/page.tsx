@@ -100,7 +100,7 @@ const TransactionPage: React.FC = () => {
 
   return (
     <div style={{ padding: "24px" }}>
-      <Card title="Recent Transactions" style={{ marginBottom: "24px" }}>
+      <Card title="Recent Transactions" style={{ marginBottom: "24px"}}>
         <Row justify="space-between" align="middle" style={{ marginBottom: "16px" }}>
           <Col>
             <Select 
