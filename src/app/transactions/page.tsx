@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Table, Card, Input, Row, Col, Button, Select, message } from "antd";
+import { Table, Card, Input, Row, Col, Button, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { SearchOutlined } from "@ant-design/icons";
 
@@ -17,8 +17,6 @@ interface Transaction {
   wallet?: string;
 }
 
-// Sample transaction data with a wallet field.
-// In a real app, you'll fetch this from your backend.
 const transactionsData: Transaction[] = [
   {
     transaction_id: "tx1",
@@ -61,18 +59,18 @@ const transactionsData: Transaction[] = [
 const columns: ColumnsType<Transaction> = [
   { title: "Transaction ID", dataIndex: "transaction_id", key: "transaction_id" },
   { title: "Coin", dataIndex: "coin", key: "coin" },
-  { 
-    title: "Amount", 
-    dataIndex: "transaction_amount", 
-    key: "transaction_amount", 
+  {
+    title: "Amount",
+    dataIndex: "transaction_amount",
+    key: "transaction_amount",
     render: (value: number) => `$${value.toFixed(2)}`,
   },
   { title: "Date", dataIndex: "date", key: "date" },
   { title: "Status", dataIndex: "status", key: "status" },
-  { 
-    title: "Fees", 
-    dataIndex: "fees", 
-    key: "fees", 
+  {
+    title: "Fees",
+    dataIndex: "fees",
+    key: "fees",
     render: (value: number) => value.toFixed(5),
   },
 ];
@@ -82,12 +80,9 @@ const TransactionPage: React.FC = () => {
   const [data, setData] = useState<Transaction[]>([]);
   const [searchText, setSearchText] = useState("");
 
-  // Filter transactions based on selected wallet and search text.
   useEffect(() => {
     const filtered = transactionsData.filter((tx) => {
-      // Only include transactions matching the selected wallet.
       const matchesWallet = tx.wallet === wallet;
-      // Search by transaction id, coin, or status.
       const lowerSearch = searchText.toLowerCase();
       const matchesSearch =
         tx.transaction_id.toLowerCase().includes(lowerSearch) ||
@@ -100,15 +95,10 @@ const TransactionPage: React.FC = () => {
 
   return (
     <div style={{ padding: "24px" }}>
-      <Card title="Recent Transactions" style={{ marginBottom: "24px"}}>
+      <Card title="Recent Transactions" style={{ marginBottom: "24px" }}>
         <Row justify="space-between" align="middle" style={{ marginBottom: "16px" }}>
           <Col>
-            <Select 
-              value={wallet}
-              onChange={(value) => setWallet(value)}
-              style={{ width: 200 }}
-            >
-              {/* In a real app, you might derive these from the user's available accounts */}
+            <Select value={wallet} onChange={(value) => setWallet(value)} style={{ width: 200 }}>
               <Option value="demo">Demo Account</Option>
               <Option value="0x123">0x123</Option>
               <Option value="0xabc">0xabc</Option>
